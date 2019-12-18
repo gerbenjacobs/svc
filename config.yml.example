@@ -1,6 +1,6 @@
 app:
   port: 127.0.0.1:8000
-  hmacToken: 78446cc0e76be676d656b0ff115edef3ab1466f0d5fb31d3250f26727aee4eb3de5126e5136d6d0736690c17350ccfbe92c4091a660f0514fb451006f814bfda
+  hmacToken: 7e77e74e43a341a4ec127cd633eb5f012e3cc06607535d67abfe0af407719508
 db:
   user: root
   password: password

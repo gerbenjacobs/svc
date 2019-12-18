@@ -35,11 +35,11 @@ func main() {
 	viper.SetConfigName("config")
 	viper.AddConfigPath(".")
 	if err := viper.ReadInConfig(); err != nil {
-		log.Fatalf("error reading config file, %s", err)
+		log.Fatalf("error reading config file: %s", err)
 	}
 	err := viper.Unmarshal(&c)
 	if err != nil {
-		log.Fatalf("unable to decode into struct, %v", err)
+		log.Fatalf("unable to decode into struct: %v", err)
 	}
 
 	// set up and check database
@@ -52,7 +52,7 @@ func main() {
 	}
 
 	// create repositories and services
-	auth := services.NewAuth([]byte(c.App.HmacToken))
+	auth := services.NewAuth([]byte(c.App.SecretToken))
 	userSvc, err := services.NewUserSvc(storage.NewUserRepository(db), auth)
 	if err != nil {
 		log.Fatalf("failed to start user service: %v", err)
@@ -66,7 +66,7 @@ func main() {
 		WebhookSvc: webhookSvc,
 	})
 	srv := &http.Server{
-		Addr:         c.App.Port,
+		Addr:         c.App.Address,
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		Handler:      mux,
@@ -92,8 +92,8 @@ func main() {
 
 type Configuration struct {
 	App struct {
-		Port      string
-		HmacToken string
+		Address     string
+		SecretToken string
 	}
 	DB struct {
 		User     string

@@ -56,7 +56,7 @@ func (a *Auth) Create(userID string) (string, error) {
 func (a *Auth) ReadFromRequest(r *http.Request) (*UserClaims, error) {
 	token, err := request.ParseFromRequest(r, request.OAuth2Extractor, a.tokenFunc, request.WithClaims(&UserClaims{}))
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse authentication request: %v", err)
 	}
 
 	claims, ok := token.Claims.(*UserClaims)

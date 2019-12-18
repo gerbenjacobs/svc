@@ -32,6 +32,7 @@ func New(dependencies Dependencies) *Handler {
 	}
 
 	r := httprouter.New()
+	r.GET("/", redirect("health"))
 	r.GET("/health", health)
 
 	r.POST("/v1/user", h.createUser)
@@ -53,4 +54,10 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func health(w http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
 	_, _ = fmt.Fprint(w, "OK!")
+}
+
+func redirect(url string) httprouter.Handle {
+	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+		http.Redirect(w, r, url, http.StatusPermanentRedirect)
+	}
 }
