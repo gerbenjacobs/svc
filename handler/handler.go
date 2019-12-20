@@ -21,11 +21,6 @@ type Dependencies struct {
 	Auth       *services.Auth
 }
 
-type handlerError struct {
-	Code    int    `json:"code"`
-	Message string `json:"message"`
-}
-
 func New(dependencies Dependencies) *Handler {
 	h := &Handler{
 		Dependencies: dependencies,
@@ -43,11 +38,15 @@ func New(dependencies Dependencies) *Handler {
 	r.PUT("/v1/webhook/:webhookID", h.updateWebhook)
 	r.DELETE("/v1/webhook/:webhookID", h.deleteWebhook)
 
+	// create chained list of middleware
+	// and wrap our router with it
 	mw := alice.New(customLoggingMiddleware)
 	h.mux = mw.Then(r)
 	return h
 }
 
+// ServeHTTP makes sure Handler implements the http.Handler interface
+// this keeps the underlying mux private
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.mux.ServeHTTP(w, r)
 }

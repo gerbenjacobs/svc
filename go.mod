@@ -3,6 +3,7 @@ module github.com/gerbenjacobs/svc
 go 1.13
 
 require (
+	github.com/TV4/logrus-stackdriver-formatter v0.1.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-sql-driver/mysql v1.4.1
 	github.com/google/uuid v1.1.1

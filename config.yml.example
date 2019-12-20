@@ -1,6 +1,9 @@
-app:
-  port: 127.0.0.1:8000
-  hmacToken: 7e77e74e43a341a4ec127cd633eb5f012e3cc06607535d67abfe0af407719508
+svc:
+  env: dev
+  name: svc
+  version: 1.0.0
+  address: 127.0.0.1:8000
+  secretToken: 7e77e74e43a341a4ec127cd633eb5f012e3cc06607535d67abfe0af407719508
 db:
   user: root
   password: password

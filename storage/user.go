@@ -3,10 +3,11 @@ package storage
 import (
 	"context"
 	"database/sql"
-	"github.com/google/uuid"
-	"log"
+	"fmt"
 
 	app "github.com/gerbenjacobs/svc"
+
+	"github.com/google/uuid"
 )
 
 type UserRepository struct {
@@ -20,32 +21,26 @@ func NewUserRepository(db *sql.DB) *UserRepository {
 }
 
 func (u *UserRepository) Create(ctx context.Context, user *app.User) error {
-	stmt, err := u.db.Prepare("INSERT INTO users (id, name, token, createdAt, updatedAt) VALUES(?, ?, ?, ?, ?)")
+	stmt, err := u.db.PrepareContext(ctx, "INSERT INTO users (id, name, token, createdAt, updatedAt) VALUES(?, ?, ?, ?, ?)")
 	if err != nil {
 		return err
 	}
 	uid, _ := user.ID.MarshalBinary()
-	_, err = stmt.Exec(uid, user.Name, user.Token, user.CreatedAt, user.UpdatedAt)
+	_, err = stmt.ExecContext(ctx, uid, user.Name, user.Token, user.CreatedAt, user.UpdatedAt)
 	return err
 }
 
 func (u *UserRepository) Read(ctx context.Context, userID uuid.UUID) (*app.User, error) {
 	uid, _ := userID.MarshalBinary()
-	rows, err := u.db.Query("SELECT id, name, token, createdAt, updatedAt FROM users WHERE id = ?", uid)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer rows.Close()
+	row := u.db.QueryRowContext(ctx, "SELECT id, name, token, createdAt, updatedAt FROM users WHERE id = ?", uid)
+
 	user := new(app.User)
-	for rows.Next() {
-		err := rows.Scan(&user.ID, &user.Name, &user.Token, &user.CreatedAt, &user.UpdatedAt)
-		if err != nil {
-			return nil, err
-		}
-	}
-	err = rows.Err()
-	if err != nil {
-		return nil, err
+	err := row.Scan(&user.ID, &user.Name, &user.Token, &user.CreatedAt, &user.UpdatedAt)
+	switch {
+	case err == sql.ErrNoRows:
+		return nil, app.ErrUserNotFound
+	case err != nil:
+		return nil, fmt.Errorf("unknown error while scanning user: %v", err)
 	}
 
 	return user, nil

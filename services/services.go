@@ -2,14 +2,15 @@ package services
 
 import (
 	"context"
+
 	"github.com/google/uuid"
 
 	app "github.com/gerbenjacobs/svc"
 )
 
 type UserService interface {
-	Create(ctx context.Context, user *app.User) error
-	Read(ctx context.Context, userID uuid.UUID) (*app.User, error)
+	Add(ctx context.Context, user *app.User) error
+	User(ctx context.Context, userID uuid.UUID) (*app.User, error)
 }
 
 type WebhookService interface {

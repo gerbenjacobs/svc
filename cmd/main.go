@@ -14,6 +14,7 @@ import (
 	"github.com/gerbenjacobs/svc/services"
 	"github.com/gerbenjacobs/svc/storage"
 
+	stackdriver "github.com/TV4/logrus-stackdriver-formatter"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/mattn/go-colorable"
 	log "github.com/sirupsen/logrus"
@@ -42,6 +43,15 @@ func main() {
 		log.Fatalf("unable to decode into struct: %v", err)
 	}
 
+	// set stackdriver formatter
+	if c.Svc.Env != "dev" {
+		//log.SetLevel(log.InfoLevel) // uncomment to hide debug level
+		log.SetFormatter(stackdriver.NewFormatter(
+			stackdriver.WithService(c.Svc.Name),
+			stackdriver.WithVersion("v"+c.Svc.Version),
+		))
+	}
+
 	// set up and check database
 	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@/%s?parseTime=true", c.DB.User, c.DB.Password, c.DB.Database))
 	if err != nil {
@@ -52,7 +62,7 @@ func main() {
 	}
 
 	// create repositories and services
-	auth := services.NewAuth([]byte(c.App.SecretToken))
+	auth := services.NewAuth([]byte(c.Svc.SecretToken))
 	userSvc, err := services.NewUserSvc(storage.NewUserRepository(db), auth)
 	if err != nil {
 		log.Fatalf("failed to start user service: %v", err)
@@ -60,16 +70,16 @@ func main() {
 	webhookSvc := services.NewWebhookService(storage.NewWebhookRepository(db))
 
 	// set up the route handler and server
-	mux := handler.New(handler.Dependencies{
+	app := handler.New(handler.Dependencies{
 		Auth:       auth,
 		UserSvc:    userSvc,
 		WebhookSvc: webhookSvc,
 	})
 	srv := &http.Server{
-		Addr:         c.App.Address,
+		Addr:         c.Svc.Address,
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
-		Handler:      mux,
+		Handler:      app,
 	}
 
 	// start running the server
@@ -91,7 +101,10 @@ func main() {
 }
 
 type Configuration struct {
-	App struct {
+	Svc struct {
+		Name        string
+		Version     string
+		Env         string
 		Address     string
 		SecretToken string
 	}
