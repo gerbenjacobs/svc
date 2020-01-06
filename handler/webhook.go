@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 
 	app "github.com/gerbenjacobs/svc"
@@ -16,8 +17,8 @@ func (h *Handler) createWebhook(w http.ResponseWriter, r *http.Request, p httpro
 func (h *Handler) readWebhook(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	user, err := h.WebhookSvc.Read(r.Context(), p.ByName("webhookID"))
 	switch {
-	case err == app.ErrWebhookNotFound:
-		http.Error(w, app.ErrWebhookNotFound.Error(), http.StatusNotFound)
+	case errors.Is(err, app.ErrWebhookNotFound):
+		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	case err != nil:
 		error500(w, err)

@@ -81,8 +81,8 @@ func (h *Handler) readUser(w http.ResponseWriter, r *http.Request, _ httprouter.
 
 	user, err := h.UserSvc.User(r.Context(), uid)
 	switch {
-	case err == app.ErrUserNotFound:
-		http.Error(w, app.ErrUserNotFound.Error(), http.StatusNotFound)
+	case errors.Is(err, app.ErrUserNotFound):
+		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	case err != nil:
 		error500(w, err)

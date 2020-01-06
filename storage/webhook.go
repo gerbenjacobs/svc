@@ -3,6 +3,7 @@ package storage
 import (
 	"context"
 	"database/sql"
+	"fmt"
 
 	app "github.com/gerbenjacobs/svc"
 )
@@ -22,7 +23,7 @@ func (w *WebhookRepository) Create(ctx context.Context, webhook *app.Webhook) er
 }
 
 func (w *WebhookRepository) Read(ctx context.Context, webhookID string) (*app.Webhook, error) {
-	return nil, nil
+	return nil, fmt.Errorf("%q: %w", webhookID, app.ErrWebhookNotFound)
 }
 
 func (w *WebhookRepository) Update(ctx context.Context, webhook *app.Webhook) error {

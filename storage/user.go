@@ -38,7 +38,7 @@ func (u *UserRepository) Read(ctx context.Context, userID uuid.UUID) (*app.User,
 	err := row.Scan(&user.ID, &user.Name, &user.Token, &user.CreatedAt, &user.UpdatedAt)
 	switch {
 	case err == sql.ErrNoRows:
-		return nil, app.ErrUserNotFound
+		return nil, fmt.Errorf("%q: %w", userID, app.ErrUserNotFound)
 	case err != nil:
 		return nil, fmt.Errorf("unknown error while scanning user: %v", err)
 	}
