@@ -36,6 +36,8 @@ func (h *Handler) createUser(w http.ResponseWriter, r *http.Request, _ httproute
 	}
 
 	// custom temporary User struct, with name only
+	// Rationale: In this theoretical situation I don't want users to touch my app.User object straight away
+	// so I create this auxiliary struct to temporary store the only information I want from the user.
 	var requestBody = struct {
 		Name string `json:"name"`
 	}{}
@@ -52,6 +54,8 @@ func (h *Handler) createUser(w http.ResponseWriter, r *http.Request, _ httproute
 		return
 	}
 
+	// Rationale: Since we're about to enter the service layer, I need to start talking in Domain Models,
+	// so I change my auxiliary struct into an actual app.User.
 	u := &app.User{
 		Name:      requestBody.Name,
 		CreatedAt: time.Now().UTC(),

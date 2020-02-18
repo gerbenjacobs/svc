@@ -23,7 +23,14 @@ throughout the application.
 Ideally *handlers* only know about *services* and services only know about *storage*.
 Use the interfaces instead of actual implementations.
 
+Everyone knows about the *Domain Models* and you should have these be the types that are
+transferred between the Service and Storage layer. It's perfectly ok to then create custom
+storage DAOs and custom input or output models for dealing with HTTP. Just make sure that
+the service and storage methods do the transformation back and forth.
+
 Separation of concern and an explicit clearness is what this structure gives you.
+
+Throughout the code I've written comments prefixed with `Rationale:` to explain a bit about the code.
 
 ## Running
 

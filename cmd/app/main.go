@@ -45,7 +45,7 @@ func main() {
 
 	// set stackdriver formatter
 	if c.Svc.Env != "dev" {
-		//log.SetLevel(log.InfoLevel) // uncomment to hide debug level
+		log.SetLevel(log.InfoLevel)
 		log.SetFormatter(stackdriver.NewFormatter(
 			stackdriver.WithService(c.Svc.Name),
 			stackdriver.WithVersion("v"+c.Svc.Version),
@@ -84,7 +84,7 @@ func main() {
 
 	// start running the server
 	go func() {
-		log.Print("Server started")
+		log.Print("Server started on " + srv.Addr)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("failed to listen: %v", err)
 		}

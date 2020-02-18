@@ -1,13 +1,10 @@
 package svc
 
 import (
-	"errors"
 	"time"
 
 	"github.com/google/uuid"
 )
-
-var ErrWebhookNotFound = errors.New("webhook not found")
 
 type Webhook struct {
 	ID        uuid.UUID `json:"id"`
