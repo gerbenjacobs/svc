@@ -1,17 +1,45 @@
 # svc
 
-An opinionated Go service and folder structure setup.
+An opinionated Go service and folder structure setup, inspired by @prep.
+
+Note: This is not an actual framework; however you are free to use, adapt and learn (parts of) it.
+
+## Rationale
+
+There are 4 main directories:
+- `cmd`: contains executables, most likely just an application (http, grpc), but also CLI tools
+- `handler`: contains all files related to handling incoming requests or triggers
+- `services`: contains your business logic
+- `storage`: contains all repository and storage related operations
+
+Domain models live in the root of the project, although people have created a `models` folder
+before.
+
+The last 3 folders each contain a self-titled go file that is the entry point of their domain.
+For example `handler/handler.go` has the actual endpoints and the mux router, 
+`services/services.go` and `storage/storage.go` contain the interfaces that are being used
+throughout the application.
+
+Ideally *handlers* only know about *services* and services only know about *storage*.
+Use the interfaces instead of actual implementations.
+
+Separation of concern and an explicit clearness is what this structure gives you.
 
 ## Running
 
-- Copy the config.yml.example to config.yml; `cp config.yml.example config.yml`
-- Create a secret token; `echo -n "my secret, make sure it's not too short" | openssl dgst -sha256`
-- Set up the database with Docker Compose; `docker-compose up -d`
-- Run the application; `go run cmd/main.go`
+- Copy the config.yml.example to config.yml
+    - `cp config.yml.example config.yml`
+- Create a secret token
+    - `echo -n "my secret, make sure it's not too short" | openssl dgst -sha256`
+- Set up the database with Docker Compose
+    - `docker-compose up -d`
+- Run the application (make sure the database container is up and running)
+    - `go run cmd/app/main.go`
 
 ## Examples
 
 You can use the User service to test some endpoints out.
+Change the token when retrieving your user to the one you received when creating a user.
 
 ### Creating a user
 
