@@ -29,11 +29,11 @@ storage DAOs and custom input or output models for dealing with HTTP (i.e. an al
 copy of app.User but without the Password field). Just make sure that the service and storage 
 methods do the transformation back and forth.
 
-Separation of concern and an explicit clearness is what this structure gives you.
+Separation of concern and an explicit clarity is what this structure gives you.
 
 _Throughout the code I've written comments prefixed with `Rationale:` to explain a bit about the code._
 
-## Running
+## Running this example
 
 - Copy the config.yml.example to config.yml
     - `cp config.yml.example config.yml`
