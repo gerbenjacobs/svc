@@ -2,11 +2,11 @@
 
 An opinionated Go service and folder structure setup, inspired by @prep.
 
-Note: This is not an actual framework; however you are free to use, adapt and learn (parts of) it.
+Note: This is **not** an actual framework; however you are free to use, adapt and learn (parts of) it.
 
 ## Rationale
 
-There are 4 main directories:
+There are 4 main directories of which 3 are synonymous to a layer:
 - `cmd`: contains executables, most likely just an application (http, grpc), but also CLI tools
 - `handler`: contains all files related to handling incoming requests or triggers
 - `services`: contains your business logic
@@ -15,7 +15,7 @@ There are 4 main directories:
 Domain models live in the root of the project, although people have created a `models` folder
 before.
 
-The last 3 folders each contain a self-titled go file that is the entry point of their domain.
+The last 3 folders each contain a self-titled go file that is the entry point of their layer.
 For example `handler/handler.go` has the actual endpoints and the mux router, 
 `services/services.go` and `storage/storage.go` contain the interfaces that are being used
 throughout the application.
@@ -23,14 +23,15 @@ throughout the application.
 Ideally *handlers* only know about *services* and services only know about *storage*.
 Use the interfaces instead of actual implementations.
 
-Everyone knows about the *Domain Models* and you should have these be the types that are
+Every layers knows about the *Domain Models* and you should have these be the types that are
 transferred between the Service and Storage layer. It's perfectly ok to then create custom
-storage DAOs and custom input or output models for dealing with HTTP. Just make sure that
-the service and storage methods do the transformation back and forth.
+storage DAOs and custom input or output models for dealing with HTTP (i.e. an almost exact 
+copy of app.User but without the Password field). Just make sure that the service and storage 
+methods do the transformation back and forth.
 
 Separation of concern and an explicit clearness is what this structure gives you.
 
-Throughout the code I've written comments prefixed with `Rationale:` to explain a bit about the code.
+_Throughout the code I've written comments prefixed with `Rationale:` to explain a bit about the code._
 
 ## Running
 
