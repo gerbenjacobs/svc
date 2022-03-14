@@ -11,9 +11,6 @@ import (
 type UserStorage interface {
 	Create(ctx context.Context, user *app.User) error
 	Read(ctx context.Context, userID uuid.UUID) (*app.User, error)
-	// Rationale: These methods are not implemented in this example.
-	// Update(ctx context.Context, user *app.User) error
-	// Delete(ctx context.Context, userID string) error
 }
 
 type WebhookStorage interface {
