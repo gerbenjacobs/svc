@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/TV4/logrus-stackdriver-formatter v0.1.0
-	github.com/go-sql-driver/mysql v1.4.1
+	github.com/go-sql-driver/mysql v1.6.0
 	github.com/golang-jwt/jwt/v4 v4.4.1
 	github.com/google/uuid v1.3.0
 	github.com/gorilla/handlers v1.4.2
@@ -30,6 +30,5 @@ require (
 	github.com/spf13/pflag v1.0.3 // indirect
 	golang.org/x/sys v0.0.0-20190422165155-953cdadca894 // indirect
 	golang.org/x/text v0.3.2 // indirect
-	google.golang.org/appengine v1.6.5 // indirect
 	gopkg.in/yaml.v2 v2.2.2 // indirect
 )
