@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
-	"github.com/dgrijalva/jwt-go/request"
+	"github.com/golang-jwt/jwt/v4"
+	"github.com/golang-jwt/jwt/v4/request"
 )
 
 // Auth is the service tasked with creating and validating jwt tokens
@@ -24,7 +24,7 @@ func NewAuth(secretToken []byte) *Auth {
 // UserClaims is a custom struct used as jwt payload
 type UserClaims struct {
 	UserID string
-	*jwt.StandardClaims
+	*jwt.RegisteredClaims
 }
 
 func (u UserClaims) Valid() error {
@@ -45,8 +45,8 @@ func (a *Auth) tokenFunc(token *jwt.Token) (interface{}, error) {
 func (a *Auth) Create(userID string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, UserClaims{
 		UserID: userID,
-		StandardClaims: &jwt.StandardClaims{
-			NotBefore: time.Now().UTC().Unix(),
+		RegisteredClaims: &jwt.RegisteredClaims{
+			NotBefore: jwt.NewNumericDate(time.Now().UTC()),
 		},
 	})
 
@@ -54,7 +54,10 @@ func (a *Auth) Create(userID string) (string, error) {
 }
 
 func (a *Auth) ReadFromRequest(r *http.Request) (*UserClaims, error) {
-	token, err := request.ParseFromRequest(r, request.OAuth2Extractor, a.tokenFunc, request.WithClaims(&UserClaims{}))
+	ext := request.MultiExtractor([]request.Extractor{
+		request.OAuth2Extractor,
+	})
+	token, err := request.ParseFromRequest(r, ext, a.tokenFunc, request.WithClaims(&UserClaims{}))
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse authentication request: %v", err)
 	}
@@ -64,8 +67,8 @@ func (a *Auth) ReadFromRequest(r *http.Request) (*UserClaims, error) {
 		return nil, errors.New("invalid user claims")
 	}
 
-	if !claims.VerifyNotBefore(time.Now().UTC().Unix(), false) {
-		return nil, fmt.Errorf("token not valid before: %v", time.Unix(claims.NotBefore, 0))
+	if !claims.VerifyNotBefore(time.Now().UTC(), false) {
+		return nil, fmt.Errorf("token not valid before: %v", claims.NotBefore)
 	}
 
 	return claims, nil
