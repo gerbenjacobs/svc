@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	app "github.com/gerbenjacobs/svc"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/google/uuid"
 )
@@ -47,10 +48,33 @@ func (u *UserRepository) Read(ctx context.Context, userID uuid.UUID) (*app.User,
 	case err == sql.ErrNoRows:
 		return nil, fmt.Errorf("user with ID %q not found: %w", userID, app.ErrUserNotFound)
 	// Rationale: Here we're explicitly not wrapping the error as the service shouldn't do anything with it.
-	// However if you started noticing these in your logs, you can probably handle them like the above case.
+	// However, if you started noticing these in your logs, you can probably handle them like the above case.
 	case err != nil:
 		return nil, fmt.Errorf("unknown error while scanning user: %v", err)
 	}
 
 	return user, nil
+}
+
+func (u *UserRepository) AllUsers(ctx context.Context) []*app.User {
+	var users []*app.User
+
+	rows, err := u.db.QueryContext(ctx, "SELECT id, name, token, createdAt, updatedAt FROM users ORDER BY createdAt")
+	if err != nil {
+		log.Errorf("failed to query users: %v", err)
+		return nil
+	}
+	for rows.Next() {
+		user := new(app.User)
+		err := rows.Scan(&user.ID, &user.Name, &user.Token, &user.CreatedAt, &user.UpdatedAt)
+		if err != nil {
+			// Rationale: since we are returning a slice of users, we don't want to stop if one fails.
+			// If they all fail, we'll probably catch that during development
+			log.Errorf("failed to scan user: %v", err)
+			continue
+		}
+		users = append(users, user)
+	}
+
+	return users
 }

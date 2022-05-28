@@ -80,3 +80,14 @@ curl -v -X GET -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ey
  "updated_at": "2019-12-18T10:46:27Z"
 }
 ```
+
+### Converting our users to a JSON output file using the CLI
+```shell script
+go run cmd/cli/main.go
+```
+
+```
+2019/12/18 12:58:23 Found 1 users
+2019/12/18 12:58:23 [93d5baed-3f2d-44a6-b3e0-02841fcf30b9] Gerben - 2019-12-18T10:46:27Z
+2019/12/18 12:58:23 Finished writing to output.json
+```

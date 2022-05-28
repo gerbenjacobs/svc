@@ -2,8 +2,6 @@ package main
 
 import (
 	"context"
-	"database/sql"
-	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
@@ -11,6 +9,7 @@ import (
 	"time"
 
 	"github.com/gerbenjacobs/svc/handler"
+	"github.com/gerbenjacobs/svc/internal"
 	"github.com/gerbenjacobs/svc/services"
 	"github.com/gerbenjacobs/svc/storage"
 
@@ -18,7 +17,6 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/mattn/go-colorable"
 	log "github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 )
 
 func main() {
@@ -32,16 +30,7 @@ func main() {
 	log.SetLevel(log.DebugLevel)
 
 	// load configuration
-	var c Configuration
-	viper.SetConfigName("config")
-	viper.AddConfigPath(".")
-	if err := viper.ReadInConfig(); err != nil {
-		log.Fatalf("error reading config file: %s", err)
-	}
-	err := viper.Unmarshal(&c)
-	if err != nil {
-		log.Fatalf("unable to decode into struct: %v", err)
-	}
+	c := internal.NewConfig()
 
 	// set stackdriver formatter
 	if c.Svc.Env != "dev" {
@@ -53,13 +42,9 @@ func main() {
 	}
 
 	// set up and check database
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", c.DB.User, c.DB.Password, c.DB.Host, c.DB.Port, c.DB.Database)
-	db, err := sql.Open("mysql", dsn)
+	db, err := internal.NewDB(c)
 	if err != nil {
-		log.Fatalf("failed to open database: %v", err)
-	}
-	if err := db.Ping(); err != nil {
-		log.Fatalf("failed to ping database: %v", err)
+		log.Fatalf("failed to set up database: %v", err)
 	}
 
 	// create repositories and services
@@ -99,21 +84,4 @@ func main() {
 		log.Fatalf("Server shutdown failed: %v", err)
 	}
 	log.Print("Server stopped successfully")
-}
-
-type Configuration struct {
-	Svc struct {
-		Name        string
-		Version     string
-		Env         string
-		Address     string
-		SecretToken string
-	}
-	DB struct {
-		Host     string
-		Port     string
-		User     string
-		Password string
-		Database string
-	}
 }

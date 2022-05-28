@@ -11,6 +11,7 @@ import (
 type UserStorage interface {
 	Create(ctx context.Context, user *app.User) error
 	Read(ctx context.Context, userID uuid.UUID) (*app.User, error)
+	AllUsers(ctx context.Context) []*app.User
 }
 
 type WebhookStorage interface {
