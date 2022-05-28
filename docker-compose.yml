@@ -7,7 +7,7 @@ services:
       MYSQL_DATABASE: svc
       MYSQL_ROOT_PASSWORD: password
     ports:
-      - 3306:3306
+      - "3306:3306"
     volumes:
       - ./storage/sql/init.sql:/docker-entrypoint-initdb.d/init.sql
   pma:
@@ -16,4 +16,4 @@ services:
     image: phpmyadmin/phpmyadmin
     restart: always
     ports:
-      - 8080:80
+      - "8080:80"

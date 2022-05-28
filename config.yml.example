@@ -5,6 +5,8 @@ svc:
   address: 127.0.0.1:8000
   secretToken: 7e77e74e43a341a4ec127cd633eb5f012e3cc06607535d67abfe0af407719508
 db:
+  host: localhost
+  port: 3306
   user: root
   password: password
   database: svc

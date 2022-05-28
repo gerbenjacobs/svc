@@ -53,7 +53,8 @@ func main() {
 	}
 
 	// set up and check database
-	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@/%s?parseTime=true", c.DB.User, c.DB.Password, c.DB.Database))
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", c.DB.User, c.DB.Password, c.DB.Host, c.DB.Port, c.DB.Database)
+	db, err := sql.Open("mysql", dsn)
 	if err != nil {
 		log.Fatalf("failed to open database: %v", err)
 	}
@@ -109,6 +110,8 @@ type Configuration struct {
 		SecretToken string
 	}
 	DB struct {
+		Host     string
+		Port     string
 		User     string
 		Password string
 		Database string
