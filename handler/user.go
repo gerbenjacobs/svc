@@ -10,6 +10,7 @@ import (
 	"time"
 
 	app "github.com/gerbenjacobs/svc"
+	"github.com/gerbenjacobs/svc/services"
 
 	"github.com/google/uuid"
 	"github.com/julienschmidt/httprouter"
@@ -29,14 +30,14 @@ func (h *Handler) createUser(w http.ResponseWriter, r *http.Request, _ httproute
 	if len(bytes) == userCreationRequestLimit+1 {
 		w.WriteHeader(http.StatusBadRequest)
 		writeJSON(w, handlerError{
-			Code:    124,
+			Code:    124, // this code doesn't mean anything in our API, but it could..
 			Message: fmt.Sprintf("Request body too large, please use %d bytes only.", userCreationRequestLimit),
 		})
 		return
 	}
 
 	// custom temporary User struct, with name only
-	// Rationale: In this theoretical situation I don't want users to touch my app.User object straight away
+	// Rationale: In this theoretical situation I don't want users to touch my app.User object straight away,
 	// so I create this auxiliary struct to temporary store the only information I want from the user.
 	var requestBody = struct {
 		Name string `json:"name"`
@@ -45,11 +46,11 @@ func (h *Handler) createUser(w http.ResponseWriter, r *http.Request, _ httproute
 		error500(w, err)
 		return
 	}
-	if len(requestBody.Name) > 50 {
+	if len(requestBody.Name) > services.MaxUsernameLength {
 		w.WriteHeader(http.StatusBadRequest)
 		writeJSON(w, handlerError{
-			Code:    412,
-			Message: "Name has a maximum limit of 50 characters",
+			Code:    412, // this code doesn't mean anything in our API, but it could..
+			Message: fmt.Sprintf("Name has a maximum limit of %d characters", services.MaxUsernameLength),
 		})
 		return
 	}
@@ -66,7 +67,7 @@ func (h *Handler) createUser(w http.ResponseWriter, r *http.Request, _ httproute
 		error500(w, err)
 		return
 	}
-	logrus.Infof("user created: %v", u.ID)
+	logrus.Infof("user created: [%v] %s", u.ID, u.Name)
 	w.WriteHeader(http.StatusCreated)
 	writeJSON(w, u)
 }

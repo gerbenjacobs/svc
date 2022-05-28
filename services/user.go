@@ -10,6 +10,8 @@ import (
 	"github.com/google/uuid"
 )
 
+const MaxUsernameLength = 50
+
 // UserSvc is our service struct that implements the services.UserService interface
 type UserSvc struct {
 	storage storage.UserStorage
