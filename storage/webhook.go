@@ -18,7 +18,7 @@ func NewWebhookRepository(db *sql.DB) *WebhookRepository {
 	}
 }
 
-func (w *WebhookRepository) Create(ctx context.Context, webhook *app.Webhook) error {
+func (w *WebhookRepository) Create(context.Context, *app.Webhook) error {
 	return nil
 }
 
@@ -26,10 +26,10 @@ func (w *WebhookRepository) Read(ctx context.Context, webhookID string) (*app.We
 	return nil, fmt.Errorf("%q: %w", webhookID, app.ErrWebhookNotFound)
 }
 
-func (w *WebhookRepository) Update(ctx context.Context, webhook *app.Webhook) error {
+func (w *WebhookRepository) Update(context.Context, *app.Webhook) error {
 	return nil
 }
 
-func (w *WebhookRepository) Delete(ctx context.Context, webhookID string) error {
+func (w *WebhookRepository) Delete(context.Context, string) error {
 	return nil
 }

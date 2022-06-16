@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"time"
 
 	app "github.com/gerbenjacobs/svc"
 
@@ -15,7 +16,7 @@ func (h *Handler) createWebhook(w http.ResponseWriter, r *http.Request, p httpro
 }
 
 func (h *Handler) readWebhook(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	user, err := h.WebhookSvc.Read(r.Context(), p.ByName("webhookID"))
+	webhook, err := h.WebhookSvc.Read(r.Context(), p.ByName("webhookID"))
 	switch {
 	case errors.Is(err, app.ErrWebhookNotFound):
 		http.Error(w, err.Error(), http.StatusNotFound)
@@ -25,13 +26,28 @@ func (h *Handler) readWebhook(w http.ResponseWriter, r *http.Request, p httprout
 		return
 	}
 
-	if err := json.NewEncoder(w).Encode(user); err != nil {
+	// custom output format for webhooks
+	// Rationale: this is just to simulate that it's okay to convert a domain model
+	// to an expected output format for HTTP responses.
+	type webhookOutput struct {
+		URL         string    `json:"url"`
+		Triggers    []string  `json:"triggers"`
+		TriggeredAt time.Time `json:"triggered_at"`
+	}
+
+	whResp := webhookOutput{
+		URL:         webhook.URL,
+		Triggers:    webhook.Events,
+		TriggeredAt: webhook.UpdatedAt,
+	}
+
+	if err := json.NewEncoder(w).Encode(whResp); err != nil {
 		error500(w, err)
 		return
 	}
 }
 
-func (h *Handler) updateWebhook(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+func (h *Handler) updateWebhook(w http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
 	http.Error(w, "webhook updating not implemented yet", http.StatusNotFound)
 }
 
