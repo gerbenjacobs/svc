@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -12,11 +14,8 @@ import (
 	"github.com/gerbenjacobs/svc/internal"
 	"github.com/gerbenjacobs/svc/services"
 	"github.com/gerbenjacobs/svc/storage"
-
-	stackdriver "github.com/TV4/logrus-stackdriver-formatter"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/mattn/go-colorable"
-	log "github.com/sirupsen/logrus"
+	"github.com/lmittmann/tint"
 )
 
 func main() {
@@ -24,22 +23,20 @@ func main() {
 	shutdown := make(chan os.Signal, 3)
 	signal.Notify(shutdown, syscall.SIGINT, syscall.SIGTERM)
 
-	// set output logging (specifically for windows)
-	log.SetFormatter(&log.TextFormatter{ForceColors: true})
-	log.SetOutput(colorable.NewColorableStdout())
-	log.SetLevel(log.DebugLevel)
-
 	// load configuration
 	c := internal.NewConfig()
 
-	// set stackdriver formatter
+	// set output logging
+	level := slog.LevelDebug
 	if c.Svc.Env != "dev" {
-		log.SetLevel(log.InfoLevel)
-		log.SetFormatter(stackdriver.NewFormatter(
-			stackdriver.WithService(c.Svc.Name),
-			stackdriver.WithVersion("v"+c.Svc.Version),
-		))
+		level = slog.LevelInfo
 	}
+
+	slog.SetDefault(
+		slog.New(
+			tint.NewHandler(os.Stdout, &tint.Options{Level: level}),
+		),
+	)
 
 	// set up and check database
 	db, err := internal.NewDB(c)

@@ -4,10 +4,9 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log/slog"
 
 	app "github.com/gerbenjacobs/svc"
-	log "github.com/sirupsen/logrus"
-
 	"github.com/google/uuid"
 )
 
@@ -61,7 +60,7 @@ func (u *UserRepository) AllUsers(ctx context.Context) []*app.User {
 
 	rows, err := u.db.QueryContext(ctx, "SELECT id, name, token, createdAt, updatedAt FROM users ORDER BY createdAt")
 	if err != nil {
-		log.Errorf("failed to query users: %v", err)
+		slog.Error("failed to query users", "err", err)
 		return nil
 	}
 	for rows.Next() {
@@ -70,7 +69,7 @@ func (u *UserRepository) AllUsers(ctx context.Context) []*app.User {
 		if err != nil {
 			// Rationale: since we are returning a slice of users, we don't want to stop if one fails.
 			// If they all fail, we'll probably catch that during development
-			log.Errorf("failed to scan user: %v", err)
+			slog.Error("failed to scan user", "err", err)
 			continue
 		}
 		users = append(users, user)

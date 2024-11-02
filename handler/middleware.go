@@ -2,13 +2,14 @@ package handler
 
 import (
 	"context"
+	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"os"
 
 	"github.com/gorilla/handlers"
 	"github.com/julienschmidt/httprouter"
-	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -32,6 +33,7 @@ func (h *Handler) AuthMiddleware(f httprouter.Handle) httprouter.Handle {
 
 func customLoggingMiddleware(handler http.Handler) http.Handler {
 	return handlers.CustomLoggingHandler(os.Stdout, handler, func(_ io.Writer, p handlers.LogFormatterParams) {
-		logrus.Debugf("%d %s \"%s %s\" %d \"%s\"", p.StatusCode, p.Request.Proto, p.Request.Method, p.URL.String(), p.Size, p.Request.Header.Get("User-Agent"))
+		msg := fmt.Sprintf("%d %s \"%s %s\" %d \"%s\"", p.StatusCode, p.Request.Proto, p.Request.Method, p.URL.String(), p.Size, p.Request.Header.Get("User-Agent"))
+		slog.Debug(msg)
 	})
 }

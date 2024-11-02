@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
+	"log/slog"
 	"net/http"
 	"time"
 
@@ -14,13 +14,12 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/julienschmidt/httprouter"
-	"github.com/sirupsen/logrus"
 )
 
 const userCreationRequestLimit = 2048
 
 func (h *Handler) createUser(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	bytes, err := ioutil.ReadAll(io.LimitReader(r.Body, userCreationRequestLimit+1))
+	bytes, err := io.ReadAll(io.LimitReader(r.Body, userCreationRequestLimit+1))
 	if err != nil {
 		error500(w, err)
 		return
@@ -67,7 +66,7 @@ func (h *Handler) createUser(w http.ResponseWriter, r *http.Request, _ httproute
 		error500(w, err)
 		return
 	}
-	logrus.Infof("user created: [%v] %s", u.ID, u.Name)
+	slog.Info("user created", slog.Group("user", "id", u.ID, "name", u.Name))
 	w.WriteHeader(http.StatusCreated)
 	writeJSON(w, u)
 }
@@ -94,6 +93,6 @@ func (h *Handler) readUser(w http.ResponseWriter, r *http.Request, _ httprouter.
 		return
 	}
 
-	logrus.WithField("user", user).Infof("user fetched: %v", user.ID)
+	slog.Info("user fetched", "user", user)
 	writeJSON(w, user)
 }
