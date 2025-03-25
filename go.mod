@@ -11,7 +11,7 @@ require (
 	github.com/gorilla/handlers v1.5.2
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/justinas/alice v1.2.0
-	github.com/lmittmann/tint v1.0.5
+	github.com/lmittmann/tint v1.0.7
 	github.com/spf13/viper v1.20.0
 )
 
