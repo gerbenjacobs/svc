@@ -2,8 +2,6 @@ module github.com/gerbenjacobs/svc
 
 go 1.23
 
-toolchain go1.23.2
-
 require (
 	github.com/go-sql-driver/mysql v1.9.1
 	github.com/golang-jwt/jwt/v4 v4.5.2
@@ -12,7 +10,7 @@ require (
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/justinas/alice v1.2.0
 	github.com/lmittmann/tint v1.0.7
-	github.com/spf13/viper v1.20.0
+	github.com/spf13/viper v1.20.1
 )
 
 require (
